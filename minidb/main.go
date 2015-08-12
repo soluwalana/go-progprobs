@@ -26,8 +26,8 @@ type Entry struct {
 
 /* A helper struct in order to marshal some JSON */
 type Response struct {
-    LockID  string				   `json:"lock_id,omitempty"`
-    Value   string				   `json:"value,omitempty"`
+	LockID  string			`json:"lock_id,omitempty"`
+	Value   string			`json:"value,omitempty"`
 }
 
 /* A lockable cache since map has no concurrent safety */
@@ -66,7 +66,9 @@ func NewServer() (server *Server, err error) {
 
 /* Helper error function */
 func (self *Server) sendError(res http.ResponseWriter, msg string, code int) {
-	http.Error(res, "{\"error\": \"" + msg + "\"}", code)
+	res.Header().Set("Content-Type", "application/json")
+	res.WriteHeader(code)
+	fmt.Fprintln(res, "{\"error\": \"" + msg + "\"}")
 }
 
 /* Helper 404 function */
@@ -105,6 +107,7 @@ func (self *Server) handleReservation(res http.ResponseWriter, req *http.Request
 		self.sendError(res, "Unable to marshal the response", http.StatusInternalServerError)
 		return
 	}
+	res.Header().Set("Content-Type", "application/json")
 	res.Write(data)
 }
 
@@ -191,6 +194,7 @@ func (self *Server) handleSet(res http.ResponseWriter, req *http.Request) {
 		self.sendError(res, "Unable to marshal the response", http.StatusInternalServerError)
 		return
 	}
+	res.Header().Set("Content-Type", "application/json")
 	res.Write(data)
 }
 
